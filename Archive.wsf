@@ -1,0 +1,98 @@
+﻿<job id="main">
+	<script language="JScript">
+	    //WScript.Echo("JScript");
+	    function GetFreeSpace(drvPath) {
+	        var fs, d, s;
+	        fs = new ActiveXObject("Scripting.FileSystemObject");
+	        d = fs.GetDrive(fs.GetDriveName(drvPath));
+	        s = "Drive " + drvPath + " - ";
+	        s += d.VolumeName;
+	        s += " Free Space: " + d.FreeSpace / 1024 + " Kbytes";
+	        return s;
+	    } 
+	</script>
+	
+	<script language="VBScript">
+		' WScript.Echo "VBScript"
+        ' Get the free space for drive C.
+        ' s = GetFreeSpace("d:")
+        path = "D:\My Pictures\Print"
+        dim time: time = NOW
+        'dim arcname = time & ".7z"
+        'WScript.Echo arcname
+        ' Execute the file MyFile.exe
+        filename = year(time) & "-" & month(time) & "-" & day(time) & ".zip"
+        filepath = "d:\my pictures\print archive\" & filename
+        exec = "C:\Progra~1\7-Zip\7z.exe "
+        param = " a -tzip " & Chr(34) & filepath & Chr(34) & " " & Chr(34) & path & Chr(34)
+        Run exec,param
+        Set objFSO = CreateObject("Scripting.FileSystemObject")
+        If objFSO.FileExists (filepath) then
+            'delete files..
+            'end
+            WScript.Echo "הגיבוי הושלם בהצלחה"
+            Decision = msgbox("לרוקן ספריה",vbyesno,"הושלם גיבוי")
+            if Decision=vbYes then 
+                RecursiveEmptyFolder(path)
+            end if
+            wscript.quit
+        else
+            WScript.Echo "הגיבוי נכשל!"            
+            wscript.quit
+        end if
+        
+        Sub EmptyFolder(ByVal sDirectoryPath)
+            on error resume next
+            Dim oFSO            
+            Dim oFolder
+            Dim oFileCollection
+            Dim oFile
+            Set oFSO = CreateObject("Scripting.FileSystemObject")            
+            set oFolder = oFSO.GetFolder(sDirectoryPath)
+            set oFileCollection = oFolder.Files
+            'If database backup files are older than 1 days, delete them.
+            For each oFile in oFileCollection
+                'If oFile.DateLastModified < (Date() - iDaysOld) Then
+                oFile.Delete(True)
+                'End If
+            Next
+            'Clean up
+            Set oFSO = Nothing
+            Set oFolder = Nothing
+            Set oFileCollection = Nothing
+            Set oFile = Nothing 
+        End Sub
+        
+        Sub RecursiveEmptyFolder(ByVal sDirectoryPath)
+            Set oFSO = CreateObject("Scripting.FileSystemObject")  
+            ProcessSubFolders oFSO.GetFolder(sDirectoryPath), iCount  
+            WScript.Echo "Files deleted: " & iCount 
+        End Sub
+        
+        Sub ProcessSubFolders(oFolder, iCount)  
+            Set cFiles = oFolder.Files  
+            For Each oFile In cFiles  
+                'PREFIX = ".DS_Store" 
+                'If Left(oFile.Name, Len(PREFIX)) = PREFIX Then 
+                oFile.Delete  
+                iCount = iCount + 1  
+                'End If 
+            Next 
+            For Each oSubFolder In oFolder.SubFolders  
+                ProcessSubFolders oSubFolder, iCount  
+                oSubFolder.Delete
+            Next 
+        End Sub 
+
+         Sub Run(ByVal sFile, ByVal sParam)
+            Dim shell
+            Set shell = CreateObject("WScript.Shell")
+            Batch = sFile & sParam
+            'WScript.Echo Batch
+            'shell.Run Chr(34) & sFile & Chr(34) & sParam, 1, false            
+            shell.Run Batch, 1, true            
+            'Shell.Run("%comspec% /k " & Batch)
+            Set shell = Nothing
+        End Sub
+	</script>
+</job>
