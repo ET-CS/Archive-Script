@@ -1,4 +1,8 @@
+Archive-Script
+==============
+
 Archive-Script is a simple .wsf (Windows Script File) for daily backup of folder into sepearte daily .zip file
+You can empty the source folder too.
 
 Requirements:
 1. Windows 98 or later.
